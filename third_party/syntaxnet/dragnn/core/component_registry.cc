@@ -15,9 +15,9 @@
 
 #include "dragnn/core/component_registry.h"
 
-namespace syntaxnet {
+//namespace syntaxnet { commented out by vseledkin according to https://github.com/google/sling/issues/112
 
 // Class registry for DRAGNN components.
-REGISTER_COMPONENT_REGISTRY("DRAGNN Component", dragnn::Component);
-
-}  // namespace syntaxnet
+//REGISTER_COMPONENT_REGISTRY("DRAGNN Component", dragnn::Component);
+REGISTER_COMPONENT_REGISTRY("DRAGNN Component", syntaxnet::dragnn::Component);
+//}  // namespace syntaxnet

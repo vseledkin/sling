@@ -137,7 +137,9 @@ class PosixFile : public File {
   }
 
   Status Flush() override {
-    if (fdatasync(fd_) != 0) return IOError(filename_, errno);
+		// for macosx
+    if (fcntl(fd_, F_FULLFSYNC) != 0) return IOError(filename_, errno);
+    //if (fdatasync(fd_) != 0) return IOError(filename_, errno);
     return Status::OK;
   }
 
@@ -248,4 +250,3 @@ File *NewStdoutFile() {
 REGISTER_FILE_SYSTEM_TYPE("posix", PosixFileSystem);
 
 }  // namespace sling
-

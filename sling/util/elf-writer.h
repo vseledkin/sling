@@ -15,7 +15,7 @@
 #ifndef SLING_UTIL_ELF_WRITER_
 #define SLING_UTIL_ELF_WRITER_
 
-#include <elf.h>
+#include "sling/util/elf.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

@@ -18,7 +18,6 @@ cc_library(
     "include/external/nsync/public",
   ],
   linkopts = [
-    "-l:/usr/local/lib/python2.7/dist-packages/tensorflow/libtensorflow_framework.so",
+    "-L:/usr/local/lib/python3.6/site-packages/tensorflow/libtensorflow_framework.so",
   ],
 )
-

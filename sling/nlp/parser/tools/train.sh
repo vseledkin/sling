@@ -48,18 +48,18 @@ set -eu
 readonly COMMAND=`echo $0 $@`
 
 # Input resources and arguments.
-SEM=local/sempar
+SEM=myparser
 COMMONS=${SEM}/commons
 OUTPUT_FOLDER=${SEM}/out
 TRAIN_FILEPATTERN=${SEM}/train.zip
-DEV_FILEPATTERN=${SEM}/dev.zip
-WORD_EMBEDDINGS_DIM=32
-PRETRAINED_WORD_EMBEDDINGS=$SEM/word2vec-32-embeddings.bin
+DEV_FILEPATTERN=${SEM}/test.zip
+WORD_EMBEDDINGS_DIM=64
+PRETRAINED_WORD_EMBEDDINGS=$SEM/ru.47GB.cbow.d64.w7.mc5.neg25.e10.b4e6.bin
 OOV_FEATURES=true
 
 # Training hyperparameters.
 BATCH_SIZE=8
-REPORT_EVERY=2000
+REPORT_EVERY=500
 LEARNING_RATE=0.0005
 SEED=2
 METHOD=adam
@@ -68,8 +68,8 @@ ADAM_BETA2=0.999
 ADAM_EPS=0.00001
 GRAD_CLIP_NORM=1.0
 DROPOUT=1.0
-TRAIN_STEPS=200000
-DECAY_STEPS=500000
+TRAIN_STEPS=1000
+DECAY_STEPS=1000
 MOVING_AVERAGE=true
 
 # Whether we should make the MasterSpec again or not.
@@ -212,7 +212,7 @@ echo $COMMAND > ${COMMAND_FILE}
 
 if [[ "$MAKE_SPEC" -eq 1 ]];
 then
-  bazel build -c opt sling/nlp/parser/trainer:generate-master-spec
+  bazel build -c opt sling/nlp/parser/trainer:generate-master-spec --verbose_failures
   bazel-bin/sling/nlp/parser/trainer/generate-master-spec \
     --documents=${TRAIN_FILEPATTERN} \
     --commons=${COMMONS} \
