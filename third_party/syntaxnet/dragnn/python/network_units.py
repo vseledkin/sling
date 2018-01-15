@@ -978,6 +978,8 @@ class FeedForwardNetwork(NetworkUnitInterface):
     # the hyperparameters rather than from self._layers.
     layer_index = int(layer_name.split('_')[1])
     print("->",self._hidden_layer_sizes,"<-")
+    print("->",list(self._hidden_layer_sizes),"<- as list")
+
     return self._hidden_layer_sizes[layer_index]
 
   def get_logits(self, network_tensors):

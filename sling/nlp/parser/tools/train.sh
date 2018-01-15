@@ -55,7 +55,7 @@ TRAIN_FILEPATTERN=${SEM}/train.zip
 DEV_FILEPATTERN=${SEM}/test.zip
 WORD_EMBEDDINGS_DIM=64
 PRETRAINED_WORD_EMBEDDINGS=$SEM/ru.47GB.cbow.d64.w7.mc5.neg25.e10.b4e6.bin
-OOV_FEATURES=true
+OOV_FEATURES=false
 
 # Training hyperparameters.
 BATCH_SIZE=8

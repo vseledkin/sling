@@ -264,17 +264,17 @@ void OutputResources(Artifacts *artifacts) {
     Store store(artifacts->global());
     Document *document = artifacts->train_corpus->Next(&store);
     if (document == nullptr) break;
-		LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens";
-		LOG(INFO) << " document text: " << document->GetText();
+		LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens ";
+		//LOG(INFO) << " document text: " << document->GetText();
 
     for (int t = 0; t < document->num_tokens(); ++t) {
       const auto &token = document->token(t);
       string word = token.text();
-			// remove number normalization because numbers are also have semantics 
+			// remove number normalization because numbers are also have semantics
 	  	//for (char &c : word) {
       //  if (c >= '0' && c <= '9') c = '9';
       //}
-      LOG(INFO) << " word " << word;
+      //LOG(INFO) << " word " << word;
       if (words.find(word) == words.end()) {
         id_to_word.emplace_back(word);
         words.insert(word);
@@ -341,6 +341,7 @@ void OutputMasterSpec(Artifacts *artifacts) {
   AddResource(lr_lstm, "word-vocab", artifacts->word_vocab);
 
   if (FLAGS_oov_lstm_features) {
+		LOG(INFO) << " use oov features ";
     AddFixedFeature(
         lr_lstm, "suffix", "suffix", 16, artifacts->num_suffixes,
         kMaxSuffixLength);
@@ -355,7 +356,9 @@ void OutputMasterSpec(Artifacts *artifacts) {
                     DocumentFeatures::QUOTE_CARDINALITY);
     AddFixedFeature(lr_lstm, "digit", "digit", 8,
                     DocumentFeatures::DIGIT__CARDINALITY);
-  }
+  } else {
+		LOG(INFO) << " do not use oov features ";
+	}
 
   // Right to left LSTM.
   auto *rl_lstm = artifacts->spec.add_component();

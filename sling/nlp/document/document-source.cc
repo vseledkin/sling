@@ -102,6 +102,7 @@ Document *DocumentSource::Next(Store *store) {
   //LOG(INFO) << " decode " << contents;
   //StringDecoder decoder(store, contents);
   // change default format of corpus to text by vseledkin
+	LOG(INFO) << " !decoding from text! " << name;
   StringReader decoder(store, contents);
   //LOG(INFO) << " decoded " << decoder.Decode().AsText();
   //return new Document(decoder.Decode().AsFrame());
