@@ -227,7 +227,7 @@ if [[ "$DO_TRAINING" -eq 1 ]];
 then
   bazel build -c opt sling/nlp/parser/tools:evaluate-frames
   bazel build -c opt sling/nlp/parser/trainer:sempar.so
-  python sling/nlp/parser/tools/train.py \
+  python3 sling/nlp/parser/tools/train.py \
     --master_spec="${OUTPUT_FOLDER}/master_spec" \
     --hyperparams="${HYPERPARAMS}" \
     --output_folder=${OUTPUT_FOLDER} \

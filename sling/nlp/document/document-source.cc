@@ -99,15 +99,19 @@ class ZipDocumentSource : public DocumentSource {
 Document *DocumentSource::Next(Store *store) {
   string name, contents;
   if (!NextSerialized(&name, &contents)) return nullptr;
-
-  StringDecoder decoder(store, contents);
-  return new Document(decoder.Decode().AsFrame());
+  //LOG(INFO) << " decode " << contents;
+  //StringDecoder decoder(store, contents);
+  // change default format of corpus to text by vseledkin
+  StringReader decoder(store, contents);
+  //LOG(INFO) << " decoded " << decoder.Decode().AsText();
+  //return new Document(decoder.Decode().AsFrame());
+  return new Document(decoder.Read().AsFrame());
 }
 
 Document *DocumentSource::Next(Store *store, string *name) {
   string contents;
   if (!NextSerialized(name, &contents)) return nullptr;
-
+  LOG(INFO) << " !decoding from binary!";
   StringDecoder decoder(store, contents);
   return new Document(decoder.Decode().AsFrame());
 }

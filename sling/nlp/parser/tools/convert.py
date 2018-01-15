@@ -104,7 +104,7 @@ class Component:
     elif component_type == 'FeedForwardNetwork':
       self.extract_feed_forward()
     else:
-      print "Warning: Unknown component type:", component_type
+      print("Warning: Unknown component type:", component_type)
 
     # Extract ops for fixed features.
     for feature in self.spec.fixed_feature:
@@ -367,4 +367,3 @@ def main(argv):
 if __name__ == '__main__':
   FLAGS.alsologtostderr = True
   tf.app.run()
-

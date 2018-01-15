@@ -68,7 +68,7 @@ def read_corpus(file_pattern):
     for index, name in enumerate(filenames):
       with gfile.GFile(name, 'r') as f:
         docs[index] = f.read()
-  print len(docs), "files in", file_pattern
+  print(len(docs), "files in", file_pattern)
   return docs
 
 
@@ -133,7 +133,7 @@ def main(unused_argv):
   # Read hyperparams and master spec.
   hyperparam_config = spec_pb2.GridPoint()
   text_format.Parse(FLAGS.hyperparams, hyperparam_config)
-  print hyperparam_config
+  print(hyperparam_config)
   master_spec = spec_pb2.MasterSpec()
 
   with gfile.GFile(FLAGS.master_spec, 'r') as fin:
@@ -182,16 +182,17 @@ def main(unused_argv):
   events_dir = os.path.join(FLAGS.output_folder, "tensorboard")
   empty_dir(events_dir)
   summary_writer = tf.summary.FileWriter(events_dir, graph)
-  print "Wrote events (incl. graph) for Tensorboard to folder:", events_dir
-  print "The graph can be viewed via"
-  print "  tensorboard --logdir=" + events_dir
-  print "  then navigating to http://localhost:6006 and clicking on 'GRAPHS'"
+  print("Wrote events (incl. graph) for Tensorboard to folder:", events_dir)
+  print("The graph can be viewed via")
+  print("  tensorboard --logdir=" + events_dir)
+  print("  then navigating to http://localhost:6006 and clicking on 'GRAPHS'")
 
   with graph.as_default():
     tf.set_random_seed(hyperparam_config.seed)
 
   # Read train and dev corpora.
-  print "Reading corpora..."
+  print("Reading corporas",FLAGS.train_corpus,FLAGS.dev_corpus)
+
   train_corpus = read_corpus(FLAGS.train_corpus)
   dev_corpus = read_corpus(FLAGS.dev_corpus)
 

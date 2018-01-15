@@ -55,7 +55,7 @@ using sling::Object;
 using sling::Store;
 using sling::StrAppend;
 using sling::StrCat;
-using sling::EmbeddingReader;
+//using sling::EmbeddingReader;
 using sling::nlp::ActionTable;
 using sling::nlp::AffixTable;
 using sling::nlp::ActionTableGenerator;
@@ -264,14 +264,17 @@ void OutputResources(Artifacts *artifacts) {
     Store store(artifacts->global());
     Document *document = artifacts->train_corpus->Next(&store);
     if (document == nullptr) break;
+		LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens";
+		LOG(INFO) << " document text: " << document->GetText();
 
     for (int t = 0; t < document->num_tokens(); ++t) {
       const auto &token = document->token(t);
       string word = token.text();
-      for (char &c : word) {
-        if (c >= '0' && c <= '9') c = '9';
-      }
-
+			// remove number normalization because numbers are also have semantics 
+	  	//for (char &c : word) {
+      //  if (c >= '0' && c <= '9') c = '9';
+      //}
+      LOG(INFO) << " word " << word;
       if (words.find(word) == words.end()) {
         id_to_word.emplace_back(word);
         words.insert(word);
@@ -310,11 +313,12 @@ void OutputResources(Artifacts *artifacts) {
 
 void CheckWordEmbeddingsDimensionality() {
   if (FLAGS_word_embeddings.empty()) return;
-
-  EmbeddingReader reader(FLAGS_word_embeddings);
-  CHECK_EQ(reader.dim(), FLAGS_word_embeddings_dim)
-      << "Pretrained embeddings have dim=" << reader.dim()
-      << ", but specified word embedding dim=" << FLAGS_word_embeddings_dim;
+	// skip this expensive operation for now
+	LOG(INFO) << " skipping dimentionality check !!! " << FLAGS_word_embeddings_dim << " given";
+	//EmbeddingReader reader(FLAGS_word_embeddings);
+  //CHECK_EQ(reader.dim(), FLAGS_word_embeddings_dim)
+  //    << "Pretrained embeddings have dim=" << reader.dim()
+  //    << ", but specified word embedding dim=" << FLAGS_word_embeddings_dim;
 }
 
 void OutputMasterSpec(Artifacts *artifacts) {
