@@ -27,7 +27,7 @@ from dragnn.python import check
 
 try:
   tf.NotDifferentiable('ExtractFixedFeatures')
-except KeyError as e:
+except KeyError, e:
   logging.info(str(e))
 
 

@@ -264,7 +264,7 @@ void OutputResources(Artifacts *artifacts) {
     Store store(artifacts->global());
     Document *document = artifacts->train_corpus->Next(&store);
     if (document == nullptr) break;
-		LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens ";
+		//LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens ";
 		//LOG(INFO) << " document text: " << document->GetText();
 
     for (int t = 0; t < document->num_tokens(); ++t) {

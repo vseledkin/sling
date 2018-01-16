@@ -560,7 +560,7 @@ def get_attrs_with_defaults(parameters, defaults):
     RuntimeError: if a key in parameters is not present in defaults.
   """
   attrs = defaults
-  for key, value in parameters.items():
+  for key, value in parameters.iteritems():
     check.In(key, defaults, 'Unknown attribute: %s' % key)
     if isinstance(defaults[key], bool):
       attrs[key] = value.lower() == 'true'
@@ -691,11 +691,8 @@ class NetworkUnitInterface(object):
 
     # Compute the cumulative dimension of all inputs.  If any input has dynamic
     # dimension, then the result is -1.
-
-    input_dims = []
-    input_dims.extend(self._fixed_feature_dims.values())
-    input_dims.extend(self._linked_feature_dims.values())
-    #print(input_dims)
+    input_dims = (self._fixed_feature_dims.values() +
+                  self._linked_feature_dims.values())
     if any(x < 0 for x in input_dims):
       self._concatenated_input_dim = -1
     else:
@@ -977,9 +974,6 @@ class FeedForwardNetwork(NetworkUnitInterface):
     # model has been built, we compute the layer size directly from
     # the hyperparameters rather than from self._layers.
     layer_index = int(layer_name.split('_')[1])
-    print("->",self._hidden_layer_sizes,"<-")
-    print("->",list(self._hidden_layer_sizes),"<- as list")
-
     return self._hidden_layer_sizes[layer_index]
 
   def get_logits(self, network_tensors):
@@ -1156,3 +1150,4 @@ class LSTMNetwork(NetworkUnitInterface):
 
   def get_logits(self, network_tensors):
     return network_tensors[self.get_layer_index('logits')]
+
