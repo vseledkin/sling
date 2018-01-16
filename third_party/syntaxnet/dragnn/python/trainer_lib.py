@@ -56,6 +56,7 @@ def annotate_dataset(sess, annotator, eval_corpus):
 def run_training_step(sess, trainer, train_corpus, batch_size):
   """Runs a single iteration of train_op on a  sampled batch."""
   batch = random.sample(train_corpus, batch_size)
+  print("HERE IS THE FUCKING BATCH!", batch)
   cost, _ = sess.run([trainer['cost'], trainer['run']],
                      feed_dict={trainer['input_batch']: batch})
   return cost

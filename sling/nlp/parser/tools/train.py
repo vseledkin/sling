@@ -54,14 +54,15 @@ flags.DEFINE_integer('batch_size', 8, 'Training batch size')
 flags.DEFINE_string('flow', '', 'Myelin flow file for model output')
 
 def read_corpus(file_pattern):
+  print("reading file",file_pattern)
   docs = []
   if file_pattern.endswith(".zip"):
-    with gfile.GFile(file_pattern, 'r') as f:
-      buf = io.BytesIO(f.read())
-      with zipfile.ZipFile(buf, 'r') as zipreader:
-        docs = [None] * len(zipreader.namelist())
-        for index, fname in enumerate(zipreader.namelist()):
-          docs[index] = zipreader.read(fname)
+    #with gfile.GFile(file_pattern, 'r') as f: # unicode decode problems, dont know why
+    #  buf = io.BytesIO(f.read())
+    with zipfile.ZipFile(file_pattern, 'r') as zipreader:
+      docs = [None] * len(zipreader.namelist())
+      for index, fname in enumerate(zipreader.namelist()):
+        docs[index] = zipreader.read(fname)
   else:
     filenames = gfile.Glob(file_pattern)
     docs = [None] * len(filenames)

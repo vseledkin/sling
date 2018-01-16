@@ -978,9 +978,6 @@ class FeedForwardNetwork(NetworkUnitInterface):
     # model has been built, we compute the layer size directly from
     # the hyperparameters rather than from self._layers.
     layer_index = int(layer_name.split('_')[1])
-    print("component", self._component.name)
-    print("index", layer_index)
-    print("structure", self._hidden_layer_sizes)
     return self._hidden_layer_sizes[layer_index]
 
   def get_logits(self, network_tensors):
