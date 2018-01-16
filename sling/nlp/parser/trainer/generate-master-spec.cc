@@ -330,7 +330,7 @@ void OutputMasterSpec(Artifacts *artifacts) {
   auto *system = lr_lstm->mutable_transition_system();
   SetParam(system, "left_to_right", "true");
   SetParam(system, "lexicon_oov", StrCat(artifacts->lexicon_oov));
-  SetParam(system, "lexicon_normalize_digits", "true");
+  SetParam(system, "lexicon_normalize_digits", "false");
   SetParam(lr_lstm->mutable_network_unit(), "hidden_layer_sizes", "256");
   lr_lstm->set_num_actions(1);
   AddResource(lr_lstm, "commons", artifacts->commons_filename);

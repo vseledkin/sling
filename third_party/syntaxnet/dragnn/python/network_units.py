@@ -560,7 +560,7 @@ def get_attrs_with_defaults(parameters, defaults):
     RuntimeError: if a key in parameters is not present in defaults.
   """
   attrs = defaults
-  for key, value in parameters.iteritems():
+  for key, value in parameters.items():
     check.In(key, defaults, 'Unknown attribute: %s' % key)
     if isinstance(defaults[key], bool):
       attrs[key] = value.lower() == 'true'
@@ -668,6 +668,7 @@ class NetworkUnitInterface(object):
       check.NotIn(spec.name, self._linked_feature_dims,
                   'Duplicate linked feature')
       check.Gt(spec.size, 0, 'Invalid linked feature size')
+
       if spec.source_component == component.name:
         source_array_dim = self.get_layer_size(spec.source_layer)
       else:
@@ -691,12 +692,13 @@ class NetworkUnitInterface(object):
 
     # Compute the cumulative dimension of all inputs.  If any input has dynamic
     # dimension, then the result is -1.
-    input_dims = (self._fixed_feature_dims.values() +
-                  self._linked_feature_dims.values())
+    input_dims = (list(self._fixed_feature_dims.values()) +
+                  list(self._linked_feature_dims.values()))
     if any(x < 0 for x in input_dims):
       self._concatenated_input_dim = -1
     else:
       self._concatenated_input_dim = sum(input_dims)
+
     tf.logging.info('component %s concat_input_dim %s', component.name,
                     self._concatenated_input_dim)
 
@@ -831,9 +833,11 @@ class FeedForwardNetwork(NetworkUnitInterface):
     # Initialize the hidden layer sizes before running the base initializer, as
     # the base initializer may need to know the size of of the hidden layer for
     # recurrent connections.
-    self._hidden_layer_sizes = (
-        map(int, self._attrs['hidden_layer_sizes'].split(','))
-        if self._attrs['hidden_layer_sizes'] else [])
+    if self._attrs['hidden_layer_sizes']:
+        self._hidden_layer_sizes = [int(x) for x in self._attrs['hidden_layer_sizes'].split(',')]
+    else:
+        self._hidden_layer_sizes = []
+
     super(FeedForwardNetwork, self).__init__(component)
 
     # Infer dropout rate from network parameters and grid hyperparameters.
@@ -974,6 +978,9 @@ class FeedForwardNetwork(NetworkUnitInterface):
     # model has been built, we compute the layer size directly from
     # the hyperparameters rather than from self._layers.
     layer_index = int(layer_name.split('_')[1])
+    print("component", self._component.name)
+    print("index", layer_index)
+    print("structure", self._hidden_layer_sizes)
     return self._hidden_layer_sizes[layer_index]
 
   def get_logits(self, network_tensors):
@@ -1150,4 +1157,3 @@ class LSTMNetwork(NetworkUnitInterface):
 
   def get_logits(self, network_tensors):
     return network_tensors[self.get_layer_index('logits')]
-
