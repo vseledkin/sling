@@ -188,6 +188,8 @@ std::vector<string> FrameEvaluation::EvaluateAndSummarize(
   commons.Freeze();
 
   Output eval;
+	LOG(INFO) << " gold_file_pattern " << gold_file_pattern;
+	LOG(INFO) << " test_file_pattern " << test_file_pattern;
   Evaluate(&commons, gold_file_pattern, test_file_pattern, &eval);
 
   // Write output to output_file.

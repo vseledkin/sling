@@ -56,7 +56,7 @@ def annotate_dataset(sess, annotator, eval_corpus):
 def run_training_step(sess, trainer, train_corpus, batch_size):
   """Runs a single iteration of train_op on a  sampled batch."""
   batch = random.sample(train_corpus, batch_size)
-  print("HERE IS THE FUCKING BATCH!", batch)
+  # here we have a list of documents for training
   cost, _ = sess.run([trainer['cost'], trainer['run']],
                      feed_dict={trainer['input_batch']: batch})
   return cost
@@ -98,12 +98,12 @@ def run_training(sess, trainers, annotator, evaluator, pretrain_steps,
     checkpoint_stats = [0] * (len(train_steps) + 1)
   tf.logging.info('Determining the training schedule...')
   target_for_step = []
-  for target_idx in xrange(len(pretrain_steps)):
+  for target_idx in range(len(pretrain_steps)):
     target_for_step += [target_idx] * pretrain_steps[target_idx]
   while sum(train_steps) > 0:
     step = random.randint(0, sum(train_steps) - 1)
     cumulative_steps = 0
-    for target_idx in xrange(len(train_steps)):
+    for target_idx in range(len(train_steps)):
       cumulative_steps += train_steps[target_idx]
       if step < cumulative_steps:
         break
@@ -128,7 +128,7 @@ def run_training(sess, trainers, annotator, evaluator, pretrain_steps,
                       step, actual_step + step, cost)
       annotated = annotate_dataset(sess, annotator, eval_corpus)
       summaries = evaluator(eval_gold, annotated)
-      for label, metric in summaries.iteritems():
+      for label, metric in summaries.items():
         write_summary(summary_writer, label, metric, actual_step + step)
       eval_metric = summaries['eval_metric']
       if best_eval_metric < eval_metric:

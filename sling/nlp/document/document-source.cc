@@ -112,9 +112,10 @@ Document *DocumentSource::Next(Store *store) {
 Document *DocumentSource::Next(Store *store, string *name) {
   string contents;
   if (!NextSerialized(name, &contents)) return nullptr;
-  LOG(INFO) << " !decoding from binary!";
-  StringDecoder decoder(store, contents);
-  return new Document(decoder.Decode().AsFrame());
+  //LOG(INFO) << " !decoding from binary!";
+	StringReader decoder(store, contents);
+  //StringDecoder decoder(store, contents);
+  return new Document(decoder.Read().AsFrame());
 }
 
 namespace {

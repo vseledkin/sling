@@ -699,7 +699,9 @@ class NetworkUnitInterface(object):
     else:
       self._concatenated_input_dim = sum(input_dims)
 
-    tf.logging.info('component %s concat_input_dim %s', component.name,
+    tf.logging.info('fixed features %s', self._fixed_feature_dims)
+    tf.logging.info('linked features %s', self._linked_feature_dims)
+    tf.logging.info('component %s concat_input_dim %s\n', component.name,
                     self._concatenated_input_dim)
 
 

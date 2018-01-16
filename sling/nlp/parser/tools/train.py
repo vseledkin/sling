@@ -76,7 +76,7 @@ def read_corpus(file_pattern):
 def write_corpus(filename, prefix, data):
   buf = io.BytesIO()
   with zipfile.ZipFile(buf, 'w') as z:
-    for i in xrange(len(data)):
+    for i in range(len(data)):
       entry = prefix + str(i)
       z.writestr(entry, data[i])
   z.close()
@@ -93,6 +93,7 @@ def evaluator(gold_docs, test_docs):
 
   gold_zip_name = os.path.join(folder, "dev.gold.zip")
   test_zip_name = os.path.join(folder, "dev.test.zip")
+  print("TEST DOCS: ", test_docs)
   write_corpus(gold_zip_name, "gold.", gold_docs)
   write_corpus(test_zip_name, "test.", test_docs)
 
