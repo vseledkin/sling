@@ -20,30 +20,32 @@
 #include "sling/nlp/document/lexicon.h"
 #include "sling/nlp/parser/action-table.h"
 #include "sling/nlp/parser/roles.h"
+#include "third_party/fasttext/fasttext.h"
 
 namespace sling {
-namespace nlp {
+    namespace nlp {
 
 // Container for resources that are typically shared (e.g. across features).
-struct SharedResources {
-  ActionTable table;
-  Store *global = nullptr;  // owned
-  RoleSet roles;
-  Lexicon lexicon;
+        struct SharedResources {
+            ActionTable table;
+            Store *global = nullptr;  // owned
+            RoleSet roles;
+            Lexicon lexicon;
+            fasttext::FastText ft;
 
-  ~SharedResources() { delete global; }
+            ~SharedResources() { delete global; }
 
-  // Loads global store from 'file'.
-  void LoadGlobalStore(const string &file);
+            // Loads global store from 'file'.
+            void LoadGlobalStore(const string &file);
 
-  // Loads action table from 'file', and initializes 'roles'.
-  void LoadActionTable(const string &file);
+            // Loads action table from 'file', and initializes 'roles'.
+            void LoadActionTable(const string &file);
 
-  // Loads resources from 'spec'.
-  void Load(const syntaxnet::dragnn::ComponentSpec &spec);
-};
+            // Loads resources from 'spec'.
+            void Load(const syntaxnet::dragnn::ComponentSpec &spec);
+        };
 
-}  // namespace nlp
+    }  // namespace nlp
 }  // namespace sling
 
 #endif // SLING_NLP_PARSER_TRAINER_SHARED_RESOURCES_H_

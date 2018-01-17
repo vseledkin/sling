@@ -110,6 +110,7 @@ cc_library(
     "//sling/nlp/parser:action-table",
     "//sling/nlp/parser:roles",
     "//third_party/syntaxnet:syntaxnet",
+    "//third_party/fasttext:fasttext-library",
   ],
 )
 

@@ -37,6 +37,7 @@ const std::vector<string> DocumentBatch::GetSerializedData() const {
   for (int i = 0; i < size(); ++i) {
     CHECK(items_[i].document != nullptr);
     output[i] = Encode(items_[i].document->top());
+    LOG(INFO) << output[i];
   }
   return output;
 }
@@ -56,8 +57,10 @@ void DocumentBatch::Decode(Store *global, bool clear_existing_annotations) {
     if (items_[i].encoded.empty()) {
       items_[i].document = new Document(items_[i].store);
     } else {
-      StringDecoder decoder(items_[i].store, items_[i].encoded);
-      Object top = decoder.Decode();
+      StringReader decoder(items_[i].store, items_[i].encoded);
+      //StringDecoder decoder(items_[i].store, items_[i].encoded);
+      //Object top = decoder.Decode();
+      Object top = decoder.Read();
       CHECK(!top.invalid());
       items_[i].document = new Document(top.AsFrame());
       if (clear_existing_annotations) {

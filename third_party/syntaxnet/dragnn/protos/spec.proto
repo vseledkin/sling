@@ -31,22 +31,23 @@ message ComponentSpec {
   // Feature space configurations.
   repeated FixedFeatureChannel fixed_feature = 4;
   repeated LinkedFeatureChannel linked_feature = 5;
+  repeated FastTextFeatureChannel fast_text_feature = 6;
 
   // Neural Network builder specification.
-  optional RegisteredModuleSpec network_unit = 6;
+  optional RegisteredModuleSpec network_unit = 7;
 
   // The registered C++ implementation of the dragnn::Component class; e.g.
   // "SyntaxNetComponent".
-  optional RegisteredModuleSpec backend = 7;
+  optional RegisteredModuleSpec backend = 8;
 
   // Number of possible actions from every state.
-  optional int32 num_actions = 8;
+  optional int32 num_actions = 9;
 
   // Options for the ComponentBuilder. If this is empty, the regular
   // tf.while_loop based builder is assumed.
-  optional RegisteredModuleSpec component_builder = 10;
+  optional RegisteredModuleSpec component_builder = 11;
 
-  reserved 9;
+  reserved 10;
 }
 
 // Super generic container for any registered sub-piece of DRAGNN.
@@ -159,6 +160,20 @@ message LinkedFeatureChannel {
   // Layer that these features should connect to. Typically zero for LSTMs
   // and single hidden-layer FF units.
   optional string source_layer = 7;
+}
+
+message FastTextFeatureChannel {
+  // Interpretable name for this feature channel.
+  optional string name = 1;
+
+  // Feature function name.
+  optional string fml = 2;
+
+  // Embedding dimension, or -1 if the link should not be embedded.
+  optional int32 embedding_dim = 3;
+
+  // Pointer to a pretrained FastText model.
+  optional Resource fast_text = 7;
 }
 
 // A hyperparameter configuration for a training run.

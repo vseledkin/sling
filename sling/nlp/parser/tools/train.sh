@@ -54,13 +54,14 @@ OUTPUT_FOLDER=${SEM}/out
 TRAIN_FILEPATTERN=${SEM}/train.zip
 DEV_FILEPATTERN=${SEM}/test.zip
 WORD_EMBEDDINGS_DIM=64
-#PRETRAINED_WORD_EMBEDDINGS=$SEM/ru.47GB.cbow.d64.w7.mc5.neg25.e10.b4e6.bin
+#PRETRAINED_WORD_EMBEDDINGS=$SEM/word2vec-32-embeddings.bin
 PRETRAINED_WORD_EMBEDDINGS=
+FT_PRETRAINED_WORD_EMBEDDINGS=$SEM/ru.47GB.cbow.d64.w7.mc5.neg25.e10.b4e6.bin
 OOV_FEATURES=false
 
 # Training hyperparameters.
 BATCH_SIZE=8
-REPORT_EVERY=9000
+REPORT_EVERY=1000
 LEARNING_RATE=0.0005
 SEED=2
 METHOD=adam
@@ -128,6 +129,10 @@ case $i in
     ;;
     --word_embeddings=*|--pretrained_embeddings=*|--pretrained_word_embeddings=*)
     PRETRAINED_WORD_EMBEDDINGS="${i#*=}"
+    shift
+    ;;
+    --ft_word_embeddings=*|--ft_pretrained_embeddings=*|--ft_pretrained_word_embeddings=*)
+    FT_PRETRAINED_WORD_EMBEDDINGS="${i#*=}"
     shift
     ;;
     --oov_features=*|--oov_lstm_features=*)
@@ -220,6 +225,7 @@ then
     --output_dir=${OUTPUT_FOLDER} \
     --word_embeddings=${PRETRAINED_WORD_EMBEDDINGS} \
     --word_embeddings_dim=${WORD_EMBEDDINGS_DIM} \
+    --ft_word_embeddings=${FT_PRETRAINED_WORD_EMBEDDINGS} \
     --oov_lstm_features=${OOV_FEATURES} \
     --logtostderr
 fi

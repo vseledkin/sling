@@ -97,7 +97,17 @@ void FixedFeatureExtractor::Init(
         if (c >= state->end() || c < state->begin()) return;
         *output = state->features()->word(c);
       });
-    } else if (name == "prefix") {
+    } else if (name == "ft_word") {
+      CHECK(rest.empty()) << rest;
+      has_document_features_ = true;
+      ft_functions_.push_back([](SemparState *state, float *output) {
+        int c = state->current();
+        if (c >= state->end() || c < state->begin()) return;
+          LOG(INFO) << " " << c << " " << state->current_token_text();
+
+        *output = state->features()->word(c);
+      });
+    }	else if (name == "prefix") {
       CHECK(rest.empty()) << rest;
       has_document_features_ = true;
       functions_.push_back([](SemparState *state, int64 *output) {

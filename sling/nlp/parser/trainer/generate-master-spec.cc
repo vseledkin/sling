@@ -75,6 +75,10 @@ DEFINE_int32(word_embeddings_dim, 32, "Word embeddings dimensionality.");
 DEFINE_string(word_embeddings, "",
               "TF recordio of pretrained word embeddings. Should have a "
               "dimensionality = FLAGS_word_embeddings_dim.");
+DEFINE_string(ft_word_embeddings, "",
+"TF recordio of pretrained word embeddings. Should have a "
+"dimensionality = FLAGS_word_embeddings_dim.");
+
 DEFINE_bool(oov_lstm_features, true,
             "Whether fallback features (shape, suffix etc) should "
             "be used in the LSTMs");
@@ -194,6 +198,19 @@ void AddFixedFeature(ComponentSpec *component,
   f->set_vocabulary_size(vocab_size);
   f->set_size(max_num_ids);
 }
+
+void AddFastTextFeature(ComponentSpec *component,
+                     const string &name,
+                     const string &feature,
+                     const string &path,
+                     int embedding_dim) {
+  auto *f = component->add_fast_text_feature();
+  f->set_name(name);
+  f->set_fml(feature);
+  f->set_embedding_dim(embedding_dim);
+  f->mutable_fast_text()->add_part()->set_file_pattern(path);
+}
+
 
 void AddFixedFeature(ComponentSpec *component,
                      const string &name,
@@ -335,30 +352,7 @@ void OutputMasterSpec(Artifacts *artifacts) {
   lr_lstm->set_num_actions(1);
   AddResource(lr_lstm, "commons", artifacts->commons_filename);
 
-  AddFixedFeature(
-      lr_lstm, "words", "word", FLAGS_word_embeddings_dim,
-      artifacts->num_words);
-  AddResource(lr_lstm, "word-vocab", artifacts->word_vocab);
-
-  if (FLAGS_oov_lstm_features) {
-		LOG(INFO) << " use oov features ";
-    AddFixedFeature(
-        lr_lstm, "suffix", "suffix", 16, artifacts->num_suffixes,
-        kMaxSuffixLength);
-    AddResource(lr_lstm, "suffix-table", artifacts->suffix_table);
-    AddFixedFeature(lr_lstm, "capitalization", "capitalization", 8,
-                    DocumentFeatures::CAPITALIZATION_CARDINALITY);
-    AddFixedFeature(lr_lstm, "hyphen", "hyphen", 8,
-                    DocumentFeatures::HYPHEN_CARDINALITY);
-    AddFixedFeature(lr_lstm, "punctuation", "punctuation", 8,
-                    DocumentFeatures::PUNCTUATION_CARDINALITY);
-    AddFixedFeature(lr_lstm, "quote", "quote", 8,
-                    DocumentFeatures::QUOTE_CARDINALITY);
-    AddFixedFeature(lr_lstm, "digit", "digit", 8,
-                    DocumentFeatures::DIGIT__CARDINALITY);
-  } else {
-		LOG(INFO) << " do not use oov features ";
-	}
+  AddFastTextFeature(lr_lstm, "fast_text","fast_text",FLAGS_ft_word_embeddings, FLAGS_word_embeddings_dim);
 
   // Right to left LSTM.
   auto *rl_lstm = artifacts->spec.add_component();
@@ -396,29 +390,18 @@ void OutputMasterSpec(Artifacts *artifacts) {
   AddResource(ff, "commons", artifacts->commons_filename);
   AddResource(ff, "action-table", artifacts->action_table_filename);
 
-  // Add pretrained embeddings for word features.
-  if (!FLAGS_word_embeddings.empty()) {
+
+  /*
+  if (!FLAGS_ft_word_embeddings.empty()) {
     for (auto &component : *artifacts->spec.mutable_component()) {
-      string vocab_file;
-      for (const auto &resource : component.resource()) {
-        if (resource.name() == "word-vocab") {
-          vocab_file = resource.part(0).file_pattern();
-        }
-      }
-      if (!vocab_file.empty()) {
-        for (auto &feature : *component.mutable_fixed_feature()) {
-          if (feature.name() == "words") {
-            feature.mutable_pretrained_embedding_matrix()->add_part()->
-                set_file_pattern(FLAGS_word_embeddings);
-            feature.mutable_vocab()->add_part()->set_file_pattern(vocab_file);
-          }
-        }
+      for (auto &feature : *component.mutable_fast_text_feature()) {
+          feature.mutable_fast_text()->add_part()->
+                  set_file_pattern(FLAGS_ft_word_embeddings);
       }
     }
-    LOG(INFO) << "Using pretrained word embeddings: " << FLAGS_word_embeddings;
-  } else {
-    LOG(INFO) << "No pretrained word embeddings specified";
-  }
+    LOG(INFO) << "Using pretrained FT embeddings: " << FLAGS_ft_word_embeddings;
+  }*/
+
 
   // Dump the master spec.
   string spec_file = FullName("master_spec");

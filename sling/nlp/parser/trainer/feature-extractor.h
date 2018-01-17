@@ -63,8 +63,8 @@ class FixedFeatureExtractor {
   const Lexicon *lexicon_ = nullptr;
 
   // Feature functions, one per channel.
-  std::vector<std::function<void(SemparState *, int64 *)>> functions_;
-
+    std::vector<std::function<void(SemparState *, int64 *)>> functions_;
+    std::vector<std::function<void(SemparState *, float *)>> ft_functions_;
   // Maximum number of feature ids, one per channel.
   std::vector<int> max_num_ids_;
 };
