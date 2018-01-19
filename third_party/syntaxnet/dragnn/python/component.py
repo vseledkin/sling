@@ -541,6 +541,14 @@ class DynamicComponentBuilder(ComponentBuilderBase):
           fixed_embedding.tensor = tf.stop_gradient(fixed_embedding.tensor)
         fixed_embeddings.append(fixed_embedding)
 
+      fast_text_embeddings = []
+      for channel_id, feature_spec in enumerate(self.spec.fast_text_feature):
+        fast_text_embedding = network_units.fast_text_feature_lookup(
+            self, state, channel_id, batch_size)
+        fast_text_embedding.tensor = tf.stop_gradient(fast_text_embedding.tensor)
+        fast_text_embeddings.append(fast_text_embedding)
+
+
       linked_embeddings = []
       for channel_id, feature_spec in enumerate(self.spec.linked_feature):
         if feature_spec.source_component == self.name:
@@ -569,5 +577,5 @@ class DynamicComponentBuilder(ComponentBuilderBase):
         index = self.network.get_layer_index(context_layer.name)
         context_tensor_arrays.append(arrays[index])
 
-      return self.network.create(fixed_embeddings, linked_embeddings,
+      return self.network.create(fixed_embeddings, linked_embeddings, fast_text_embeddings,
                                  context_tensor_arrays, during_training)

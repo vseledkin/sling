@@ -173,7 +173,7 @@ message FastTextFeatureChannel {
   optional int32 embedding_dim = 3;
 
   // Pointer to a pretrained FastText model.
-  optional Resource fast_text = 7;
+  optional Resource fast_text_model = 7;
 }
 
 // A hyperparameter configuration for a training run.

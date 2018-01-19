@@ -180,12 +180,11 @@ def emit_oracle_labels(handle, component, name=None):
 
 
 _ops.RegisterShape("EmitOracleLabels")(None)
+
+
 _extract_fixed_features_outputs = ["ids"]
-
-
 _ExtractFixedFeaturesOutput = _collections.namedtuple("ExtractFixedFeatures",
                                                       _extract_fixed_features_outputs)
-
 
 def extract_fixed_features(handle, batch_size, component,
                            channel_id, max_num_ids, name=None):
@@ -210,11 +209,40 @@ def extract_fixed_features(handle, batch_size, component,
                                 component=component, channel_id=channel_id,
                                 max_num_ids=max_num_ids,
                                 name=name)
-  #return _ExtractFixedFeaturesOutput._make(result)
+
   return result
 
-
 _ops.RegisterShape("ExtractFixedFeatures")(None)
+# fast text
+_extract_fast_text_features_outputs = ["ft_embeddings"]
+_ExtractFastTextFeaturesOutput = _collections.namedtuple("ExtractFastTextFeatures",
+                                                      _extract_fast_text_features_outputs)
+
+
+def extract_fast_text_features(handle, batch_size, component,
+                           channel_id, name=None):
+    r"""Given a ComputeSession, Component, and channel index, output fast text features.
+
+    Args:
+      handle: A `Tensor` of type `string`. A handle to a ComputeSession.
+      batch_size: an `int`. The current batch size.
+      component: A `string`. The component name.
+      channel_id: An `int`. The feature channel to extract features for.
+      name: A name for the operation (optional).
+
+    Returns:
+      emdeddings: A `Tensor` of type `float32`.
+    """
+    result = _op_def_lib.apply_op("ExtractFastTextFeatures", handle=handle,
+                                  batch_size=batch_size,
+                                  component=component, channel_id=channel_id,
+                                  name=name)
+
+    return result
+
+
+_ops.RegisterShape("ExtractFastTextFeatures")(None)
+# fast text end
 _extract_link_features_outputs = ["step_idx", "idx"]
 
 
@@ -534,6 +562,29 @@ op {
   }
   attr {
     name: "max_num_ids"
+    type: "int"
+  }
+}
+op {
+  name: "ExtractFastTextFeatures"
+  input_arg {
+    name: "handle"
+    type: DT_STRING
+  }
+  input_arg {
+    name: "batch_size"
+    type: DT_INT32
+  }
+  output_arg {
+    name: "ft_embeddings"
+    type: DT_FLOAT
+  }
+  attr {
+    name: "component"
+    type: "string"
+  }
+  attr {
+    name: "channel_id"
     type: "int"
   }
 }

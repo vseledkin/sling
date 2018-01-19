@@ -208,7 +208,7 @@ void AddFastTextFeature(ComponentSpec *component,
   f->set_name(name);
   f->set_fml(feature);
   f->set_embedding_dim(embedding_dim);
-  f->mutable_fast_text()->add_part()->set_file_pattern(path);
+  f->mutable_fast_text_model()->add_part()->set_file_pattern(path);
 }
 
 
