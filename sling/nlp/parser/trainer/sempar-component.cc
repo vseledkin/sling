@@ -43,6 +43,7 @@ void SemparComponent::InitializeComponent(const ComponentSpec &spec) {
 
   // Set up the underlying transition system.
   const string &system = spec.transition_system().registered_name();
+	LOG(INFO) << spec.name() << " component system " << system;
   if (system == "shift-only") {
     system_type_ = SHIFT_ONLY;
   } else if (system == "sempar") {
@@ -55,13 +56,6 @@ void SemparComponent::InitializeComponent(const ComponentSpec &spec) {
   resources_.Load(spec_);
   const auto &lexicon = resources_.lexicon;
   const string &name = spec.name();
-  LOG(INFO) << name << ": loaded " << lexicon.size() << " words";
-  LOG(INFO) << name << ": loaded " << lexicon.prefixes().size() << " prefixes";
-  LOG(INFO) << name << ": loaded " << lexicon.suffixes().size() << " suffixes";
-  if (lexicon.size() > 0) {
-    LOG(INFO) << "Lexicon OOV: " << lexicon.oov();
-    LOG(INFO) << "Lexicon normalize digits: " << lexicon.normalize_digits();
-  }
 
   // Determine if processing will be done left to right or not.
   left_to_right_ = true;
@@ -76,7 +70,6 @@ void SemparComponent::InitializeComponent(const ComponentSpec &spec) {
   // Set up the feature extractors.
   fixed_feature_extractor_.Init(spec_, &resources_);
   link_feature_extractor_.Init(spec_, &resources_);
-
   // Initialize gold transition generator.
   gold_transition_generator_.Init(resources_.global);
 }
@@ -190,6 +183,8 @@ void SemparComponent::GetFixedFeatures(int channel_id, int64 *output) const {
 }
 
 void SemparComponent::GetFastTextFeatures(int channel_id, float *output) const {
+	std::cout << " batch: " << batch_.size() << std::endl;
+	LOG(INFO) << " batch: " << batch_.size();
   int size = batch_.size() * 64;
   for (int i = 0; i < size; ++i) output[i] = -1;
 

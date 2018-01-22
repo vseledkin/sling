@@ -55,7 +55,7 @@ using sling::Object;
 using sling::Store;
 using sling::StrAppend;
 using sling::StrCat;
-//using sling::EmbeddingReader;
+using sling::EmbeddingReader;
 using sling::nlp::ActionTable;
 using sling::nlp::AffixTable;
 using sling::nlp::ActionTableGenerator;
@@ -76,8 +76,8 @@ DEFINE_string(word_embeddings, "",
               "TF recordio of pretrained word embeddings. Should have a "
               "dimensionality = FLAGS_word_embeddings_dim.");
 DEFINE_string(ft_word_embeddings, "",
-"TF recordio of pretrained word embeddings. Should have a "
-"dimensionality = FLAGS_word_embeddings_dim.");
+							"FT pretrained word embeddings. Should have a "
+							"dimensionality = FLAGS_word_embeddings_dim.");
 
 DEFINE_bool(oov_lstm_features, true,
             "Whether fallback features (shape, suffix etc) should "
@@ -199,6 +199,16 @@ void AddFixedFeature(ComponentSpec *component,
   f->set_size(max_num_ids);
 }
 
+void AddFixedFeature(ComponentSpec *component,
+                     const string &name,
+                     const string &feature,
+                     int embedding_dim,
+                     int vocab_size,
+                     int max_num_ids = 1) {
+  AddFixedFeature(
+      component, name, feature, "", embedding_dim, vocab_size, max_num_ids);
+}
+
 void AddFastTextFeature(ComponentSpec *component,
                      const string &name,
                      const string &feature,
@@ -209,17 +219,6 @@ void AddFastTextFeature(ComponentSpec *component,
   f->set_fml(feature);
   f->set_embedding_dim(embedding_dim);
   f->mutable_fast_text_model()->add_part()->set_file_pattern(path);
-}
-
-
-void AddFixedFeature(ComponentSpec *component,
-                     const string &name,
-                     const string &feature,
-                     int embedding_dim,
-                     int vocab_size,
-                     int max_num_ids = 1) {
-  AddFixedFeature(
-      component, name, feature, "", embedding_dim, vocab_size, max_num_ids);
 }
 
 void AddLinkedFeature(ComponentSpec *component,
@@ -281,17 +280,14 @@ void OutputResources(Artifacts *artifacts) {
     Store store(artifacts->global());
     Document *document = artifacts->train_corpus->Next(&store);
     if (document == nullptr) break;
-		//LOG(INFO) << " reading document " << document << " of " << document->num_tokens() << " tokens ";
-		//LOG(INFO) << " document text: " << document->GetText();
 
     for (int t = 0; t < document->num_tokens(); ++t) {
       const auto &token = document->token(t);
       string word = token.text();
-			// remove number normalization because numbers are also have semantics
-	  	//for (char &c : word) {
-      //  if (c >= '0' && c <= '9') c = '9';
-      //}
-      //LOG(INFO) << " word " << word;
+      for (char &c : word) {
+        if (c >= '0' && c <= '9') c = '9';
+      }
+
       if (words.find(word) == words.end()) {
         id_to_word.emplace_back(word);
         words.insert(word);
@@ -330,12 +326,11 @@ void OutputResources(Artifacts *artifacts) {
 
 void CheckWordEmbeddingsDimensionality() {
   if (FLAGS_word_embeddings.empty()) return;
-	// skip this expensive operation for now
-	LOG(INFO) << " skipping dimentionality check !!! " << FLAGS_word_embeddings_dim << " given";
-	//EmbeddingReader reader(FLAGS_word_embeddings);
-  //CHECK_EQ(reader.dim(), FLAGS_word_embeddings_dim)
-  //    << "Pretrained embeddings have dim=" << reader.dim()
-  //    << ", but specified word embedding dim=" << FLAGS_word_embeddings_dim;
+
+  EmbeddingReader reader(FLAGS_word_embeddings);
+  CHECK_EQ(reader.dim(), FLAGS_word_embeddings_dim)
+      << "Pretrained embeddings have dim=" << reader.dim()
+      << ", but specified word embedding dim=" << FLAGS_word_embeddings_dim;
 }
 
 void OutputMasterSpec(Artifacts *artifacts) {
@@ -352,7 +347,24 @@ void OutputMasterSpec(Artifacts *artifacts) {
   lr_lstm->set_num_actions(1);
   AddResource(lr_lstm, "commons", artifacts->commons_filename);
 
-  AddFastTextFeature(lr_lstm, "fast_text","fast_text",FLAGS_ft_word_embeddings, FLAGS_word_embeddings_dim);
+	AddFastTextFeature(lr_lstm, "fast_text","fast_text",FLAGS_ft_word_embeddings, FLAGS_word_embeddings_dim);
+
+  if (FLAGS_oov_lstm_features) {
+    AddFixedFeature(
+        lr_lstm, "suffix", "suffix", 16, artifacts->num_suffixes,
+        kMaxSuffixLength);
+    AddResource(lr_lstm, "suffix-table", artifacts->suffix_table);
+    AddFixedFeature(lr_lstm, "capitalization", "capitalization", 8,
+                    DocumentFeatures::CAPITALIZATION_CARDINALITY);
+    AddFixedFeature(lr_lstm, "hyphen", "hyphen", 8,
+                    DocumentFeatures::HYPHEN_CARDINALITY);
+    AddFixedFeature(lr_lstm, "punctuation", "punctuation", 8,
+                    DocumentFeatures::PUNCTUATION_CARDINALITY);
+    AddFixedFeature(lr_lstm, "quote", "quote", 8,
+                    DocumentFeatures::QUOTE_CARDINALITY);
+    AddFixedFeature(lr_lstm, "digit", "digit", 8,
+                    DocumentFeatures::DIGIT__CARDINALITY);
+  }
 
   // Right to left LSTM.
   auto *rl_lstm = artifacts->spec.add_component();
@@ -390,18 +402,29 @@ void OutputMasterSpec(Artifacts *artifacts) {
   AddResource(ff, "commons", artifacts->commons_filename);
   AddResource(ff, "action-table", artifacts->action_table_filename);
 
-
-  /*
-  if (!FLAGS_ft_word_embeddings.empty()) {
+  // Add pretrained embeddings for word features.
+  if (!FLAGS_word_embeddings.empty()) {
     for (auto &component : *artifacts->spec.mutable_component()) {
-      for (auto &feature : *component.mutable_fast_text_feature()) {
-          feature.mutable_fast_text()->add_part()->
-                  set_file_pattern(FLAGS_ft_word_embeddings);
+      string vocab_file;
+      for (const auto &resource : component.resource()) {
+        if (resource.name() == "word-vocab") {
+          vocab_file = resource.part(0).file_pattern();
+        }
+      }
+      if (!vocab_file.empty()) {
+        for (auto &feature : *component.mutable_fixed_feature()) {
+          if (feature.name() == "words") {
+            feature.mutable_pretrained_embedding_matrix()->add_part()->
+                set_file_pattern(FLAGS_word_embeddings);
+            feature.mutable_vocab()->add_part()->set_file_pattern(vocab_file);
+          }
+        }
       }
     }
-    LOG(INFO) << "Using pretrained FT embeddings: " << FLAGS_ft_word_embeddings;
-  }*/
-
+    LOG(INFO) << "Using pretrained word embeddings: " << FLAGS_word_embeddings;
+  } else {
+    LOG(INFO) << "No pretrained word embeddings specified";
+  }
 
   // Dump the master spec.
   string spec_file = FullName("master_spec");

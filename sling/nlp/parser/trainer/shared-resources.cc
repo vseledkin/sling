@@ -20,6 +20,8 @@
 namespace sling {
 namespace nlp {
 
+fasttext::FastText *fst = nullptr;
+
 void SharedResources::LoadActionTable(const string &file) {
   CHECK(global != nullptr);
   Store temp(global);
@@ -71,9 +73,18 @@ void SharedResources::Load(const syntaxnet::dragnn::ComponentSpec &spec) {
   // make shared resource for fast text model
   for (const auto &r : spec.fast_text_feature()) {
     string file = r.fast_text_model().part(0).file_pattern();
-    std::cout  << "Loading FT model: " << file << std::endl;
-    ft.loadModel(file); // assume only one ft per resource
-    std::cout  << "Loaded FT model:  " << file << std::endl;
+		if (fst == nullptr) {
+			LOG(INFO) << spec.name() << ": loading " << file;
+			fst = new fasttext::FastText();
+			fst->loadModel(file); // assume only one ft per resource
+			LOG(INFO) << spec.name() << ": loaded " << file;
+			LOG(INFO) << spec.name() << ": loaded " << fst->getDimension() << " dimensional embeddings";
+			LOG(INFO) << spec.name() << ": loaded " << fst->getNwords() << " words";
+		} else {
+			LOG(INFO) << spec.name() << ": previously loaded " << file;
+			LOG(INFO) << spec.name() << ": previously loaded " << fst->getDimension() << " dimensional embeddings";
+			LOG(INFO) << spec.name() << ": previously loaded " << fst->getNwords() << " words";
+		}
   }
 }
 

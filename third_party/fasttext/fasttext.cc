@@ -712,6 +712,10 @@ int FastText::getDimension() const {
     return args_->dim;
 }
 
+int FastText::getNwords() {
+    return dict_->nwords();
+}
+
 bool FastText::isQuant() const {
   return quant_;
 }

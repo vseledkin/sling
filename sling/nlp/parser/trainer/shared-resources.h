@@ -29,11 +29,13 @@ namespace sling {
         struct SharedResources {
             ActionTable table;
             Store *global = nullptr;  // owned
+						static fasttext::FastText *ft;
             RoleSet roles;
             Lexicon lexicon;
-            fasttext::FastText ft;
 
-            ~SharedResources() { delete global; }
+            ~SharedResources() {
+							delete global;
+						}
 
             // Loads global store from 'file'.
             void LoadGlobalStore(const string &file);

@@ -114,6 +114,7 @@ class FastText {
 
   void loadVectors(std::string);
   int getDimension() const;
+  int getNwords();
   bool isQuant() const;
 };
 }
