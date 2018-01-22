@@ -24,12 +24,11 @@
 
 namespace sling {
     namespace nlp {
-
 // Container for resources that are typically shared (e.g. across features).
         struct SharedResources {
             ActionTable table;
             Store *global = nullptr;  // owned
-						static fasttext::FastText *ft;
+						static fasttext::FastText *fst;
             RoleSet roles;
             Lexicon lexicon;
 

@@ -132,6 +132,9 @@ class SemparComponent : public syntaxnet::dragnn::Component {
   // Extractor for linked features.
   LinkFeatureExtractor link_feature_extractor_;
 
+	FastTextFeatureExtractor fast_text_feature_extractor_;
+
+
   // The ComponentSpec used to initialize this component.
   syntaxnet::dragnn::ComponentSpec spec_;
 

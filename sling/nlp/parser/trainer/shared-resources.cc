@@ -20,7 +20,7 @@
 namespace sling {
 namespace nlp {
 
-fasttext::FastText *fst = nullptr;
+fasttext::FastText *SharedResources::fst = nullptr; 
 
 void SharedResources::LoadActionTable(const string &file) {
   CHECK(global != nullptr);

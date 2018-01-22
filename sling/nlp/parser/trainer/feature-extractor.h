@@ -63,8 +63,7 @@ class FixedFeatureExtractor {
   const Lexicon *lexicon_ = nullptr;
 
   // Feature functions, one per channel.
-    std::vector<std::function<void(SemparState *, int64 *)>> functions_;
-    std::vector<std::function<void(SemparState *, float *)>> ft_functions_;
+  std::vector<std::function<void(SemparState *, int64 *)>> functions_;
   // Maximum number of feature ids, one per channel.
   std::vector<int> max_num_ids_;
 };
@@ -102,6 +101,27 @@ class LinkFeatureExtractor {
   int frame_creation_limit_ = 0;
   int frame_focus_limit_ = 0;
   int frame_end_limit_ = 0;
+};
+
+class FastTextFeatureExtractor {
+ public:
+  // Initializes all linked feature channels.
+  void Init(syntaxnet::dragnn::ComponentSpec &spec, SharedResources *resources);
+
+  // From 'state', computes linked features for 'channel', and reports the
+  // output from 'output' onwards.
+  void Extract(int channel, SemparState *state, int *output) const;
+
+  // Reports the channel size (i.e. number of feature values) for 'channel'.
+  int ChannelSize(int channel) const { return channel_size_[channel]; }
+
+ private:
+  // Feature functions, one per channel.
+  std::vector<std::function<void(SemparState *, int *)>> functions_;
+
+  // Channel size, one per channel.
+  std::vector<int> channel_size_;
+	fasttext::FastText *fst_ = nullptr;
 };
 
 }  // namespace nlp
