@@ -132,6 +132,22 @@ channel_id: The feature channel to extract features for.
 max_num_ids: An `int`. Maximum number of output feature ids per batch item.
 )doc");
 
+REGISTER_OP("ExtractFastTextFeatures")
+    .Input("handle: string")
+    .Input("batch_size: int32")
+    .Output("ft_embeddings: float32")
+    .Attr("component: string")
+    .Attr("channel_id: int")
+    .Doc(R"doc(
+Given a ComputeSession, Component, and channel index, output fixed features.
+
+handle: A handle to a ComputeSession.
+batch_size: The current batch size.
+ft_embeddings: FastText embeddings.
+component: The name of a Component instance, matching the ComponentSpec.name.
+channel_id: The feature channel to extract features for.
+)doc");
+
 REGISTER_OP("ExtractLinkFeatures")
     .Input("handle: string")
     .Input("batch_size: int32")

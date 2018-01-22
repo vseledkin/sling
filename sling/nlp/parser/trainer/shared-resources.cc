@@ -68,6 +68,13 @@ void SharedResources::Load(const syntaxnet::dragnn::ComponentSpec &spec) {
       lexicon.InitSuffixes(contents.c_str(), contents.size());
     }
   }
+  // make shared resource for fast text model
+  for (const auto &r : spec.fast_text_feature()) {
+    string file = r.fast_text_model().part(0).file_pattern();
+    std::cout  << "Loading FT model: " << file << std::endl;
+    ft.loadModel(file); // assume only one ft per resource
+    std::cout  << "Loaded FT model:  " << file << std::endl;
+  }
 }
 
 }  // namespace nlp

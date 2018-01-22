@@ -66,8 +66,13 @@ class ComputeSession {
   // through to the relevant Component's GetFixedFeatures() call.
   void GetInputFeatures(
       const string &component_name,
-      int channel_id,
-      int64 *output) const;
+      int channel_id, int64 *output) const;
+      
+  // Get the fast text features for the given component and channel. This passes
+  // through to the relevant Component's GetFastTextFeatures() call.
+  void GetFastTextFeatures(
+      const string &component_name,
+      int channel_id, float *output) const;
 
   // Get the linked features for the given component and channel.i
   void GetTranslatedLinkFeatures(

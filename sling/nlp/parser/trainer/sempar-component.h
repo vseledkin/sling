@@ -82,6 +82,9 @@ class SemparComponent : public syntaxnet::dragnn::Component {
   // Extracts and populates the fixed features for the specified channel.
   void GetFixedFeatures(int channel_id, int64 *output) const override;
 
+  // Extracts and populates the fast text features for the specified channel.
+  void GetFastTextFeatures(int channel_id, float *output) const override;
+
   // Returns the linked features for the specified channel.
   void GetRawLinkFeatures(int channel_id, int *steps, int *batch)
       const override;

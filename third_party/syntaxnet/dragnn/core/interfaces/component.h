@@ -74,6 +74,10 @@ class Component : public sling::Component<Component> {
   // specified channel.
   virtual void GetFixedFeatures(int channel_id, int64 *output) const = 0;
 
+  // Extracts and populates into 'output' onwards the fast text features for the
+  // specified channel.
+  virtual void GetFastTextFeatures(int channel_id, float *output) const = 0;
+
   // Returns the linked features for the specified channel.
   virtual void GetRawLinkFeatures(int channel_id, int *steps, int *batch)
       const = 0;

@@ -55,8 +55,6 @@ cc_library(
     "dragnn/core/ops/dragnn_op_kernels.cc",
     "dragnn/core/ops/embedding_ops.cc",
     "dragnn/core/ops/embedding_op_kernels.cc",
-    "dragnn/core/ops/ft_embedding_ops.cc",
-    "dragnn/core/ops/ft_embedding_op_kernels.cc",
   ],
   hdrs = [
     "dragnn/core/compute_session.h",

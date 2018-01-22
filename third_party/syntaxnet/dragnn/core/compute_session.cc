@@ -150,6 +150,11 @@ void ComputeSession::GetInputFeatures(
   GetReadiedComponent(component_name)->GetFixedFeatures(channel_id, output);
 }
 
+void ComputeSession::GetFastTextFeatures(
+    const string &component_name, int channel_id, float *output) const {
+  GetReadiedComponent(component_name)->GetFastTextFeatures(channel_id, output);
+}
+
 void ComputeSession::GetTranslatedLinkFeatures(
     const string &component_name, int channel_id, int size,
     int *steps, int *batch) {

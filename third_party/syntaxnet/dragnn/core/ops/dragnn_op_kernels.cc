@@ -283,6 +283,37 @@ class ExtractFixedFeatures : public ComputeSessionOp {
 REGISTER_KERNEL_BUILDER(Name("ExtractFixedFeatures").Device(DEVICE_CPU),
                         ExtractFixedFeatures);
 
+
+class ExtractFastTextFeatures : public ComputeSessionOp {
+public:
+    explicit ExtractFastTextFeatures(OpKernelConstruction *context)
+            : ComputeSessionOp(context) {
+        OP_REQUIRES_OK(context, context->GetAttr("channel_id", &channel_id_));
+        OP_REQUIRES_OK(context, context->MatchSignature(
+                {DT_STRING, DT_INT32}, {DT_FLOAT}));
+    }
+
+    bool OutputsHandle() const override { return false; }
+
+    bool RequiresComponentName() const override { return true; }
+
+    void ComputeWithState(OpKernelContext *context,
+                          ComputeSession *session) override {
+        int batch_size = context->input(1).scalar<int>()();
+        Tensor *embeddings;
+        CHECK(context->allocate_output(0, TensorShape({batch_size * 64}), &embeddings).ok());
+
+        float *output = embeddings->vec<float>().data();
+        session->GetFastTextFeatures(component_name(), channel_id_, output);
+    }
+
+private:
+    int channel_id_;
+    TF_DISALLOW_COPY_AND_ASSIGN(ExtractFastTextFeatures);
+};
+
+REGISTER_KERNEL_BUILDER(Name("ExtractFastTextFeatures").Device(DEVICE_CPU),
+  ExtractFastTextFeatures);
 // Given a ComputeSession and a channel index, outputs link features.
 // Link features are returned as two vectors of size: batch_size * channel_size:
 //   - step_idx: specifies the element to read in a tensor array of activations,

@@ -189,6 +189,16 @@ void SemparComponent::GetFixedFeatures(int channel_id, int64 *output) const {
   }
 }
 
+void SemparComponent::GetFastTextFeatures(int channel_id, float *output) const {
+  int size = batch_.size() * 64;
+  for (int i = 0; i < size; ++i) output[i] = -1;
+
+  //for (SemparState *state : batch_) {
+  //  fixed_feature_extractor_.Extract(channel_id, state, output);
+  //  output += columns;
+  //}
+}
+
 void SemparComponent::GetRawLinkFeatures(
     int channel_id, int *steps, int *batch) const {
   int channel_size = link_feature_extractor_.ChannelSize(channel_id);
