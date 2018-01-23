@@ -110,14 +110,14 @@ class FastTextFeatureExtractor {
 
   // From 'state', computes linked features for 'channel', and reports the
   // output from 'output' onwards.
-  void Extract(int channel, SemparState *state, int *output) const;
+  void Extract(int channel, SemparState *state, float *output) const;
 
   // Reports the channel size (i.e. number of feature values) for 'channel'.
   int ChannelSize(int channel) const { return channel_size_[channel]; }
 
  private:
   // Feature functions, one per channel.
-  std::vector<std::function<void(SemparState *, int *)>> functions_;
+  std::vector<std::function<void(SemparState *, float *)>> functions_;
 
   // Channel size, one per channel.
   std::vector<int> channel_size_;

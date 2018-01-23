@@ -183,8 +183,10 @@ void SemparComponent::GetFixedFeatures(int channel_id, int64 *output) const {
 }
 
 void SemparComponent::GetFastTextFeatures(int channel_id, float *output) const {
+  int channel_size = fast_text_feature_extractor_.ChannelSize(channel_id);
 	std::cout << " batch: " << batch_.size() << std::endl;
-	LOG(INFO) << " batch: " << batch_.size();
+  std::cout << " channel_size: " << channel_size << std::endl;
+
   int size = batch_.size() * 64;
   for (int i = 0; i < size; ++i) output[i] = -1;
 

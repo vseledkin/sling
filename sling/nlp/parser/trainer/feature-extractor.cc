@@ -279,73 +279,18 @@ void FastTextFeatureExtractor::Init(
 		CHECK_EQ(size, resources->fst->getDimension());
 		fst_ = resources->fst;
 
-		functions_.push_back([](SemparState *state, int *output) {
+		functions_.push_back([](SemparState *state, float *output) {
 			int c = state->current();
 			if (c >= state->end() || c < state->begin()) return;
 				LOG(INFO) << " " << c << " " << state->current_token_text();
-
-			*output = state->features()->word(c);
+      output = state->features()->vector(c);
 		});
-
-/**
-    if (name == "focus") {
-      CHECK_EQ(size, 1);
-      functions_.push_back([](SemparState *state, int *output) {
-        int c = state->current();
-        if ((c >= state->begin()) && (c < state->end())) {
-          *output = c - state->begin();
-        }
-      });
-    } else if (name == "history") {
-      history_limit_ = size;
-      functions_.push_back([this](SemparState *state, int *output) {
-        for (int i = 0; i < this->history_limit_; ++i) {
-          *output++ = i;
-        }
-      });
-    } else if (name == "frame-creation") {
-      frame_creation_limit_ = size;
-      functions_.push_back([this](SemparState *state, int *output) {
-        CHECK(!state->shift_only());
-        for (int i = 0; i < this->frame_creation_limit_; ++i) {
-          if (i == state->parser_state()->AttentionSize()) break;
-          *output++ = state->CreationStep(i);
-        }
-      });
-    } else if (name == "frame-focus") {
-      frame_focus_limit_ = size;
-      functions_.push_back([this](SemparState *state, int *output) {
-        CHECK(!state->shift_only());
-        for (int i = 0; i < this->frame_focus_limit_; ++i) {
-          if (i == state->parser_state()->AttentionSize()) break;
-          *output++ = state->FocusStep(i);
-        }
-      });
-    } else if (name == "frame-end") {
-      frame_end_limit_ = size;
-      functions_.push_back([this](SemparState *state, int *output) {
-        CHECK(!state->shift_only());
-        const auto *parser_state = state->parser_state();
-        for (int i = 0; i < this->frame_end_limit_; ++i) {
-          if (i == parser_state->AttentionSize()) break;
-          int frame = parser_state->Attention(i);
-          int end = parser_state->FrameEvokeEnd(frame);
-
-          // 'end' is exclusive so end - 1 is the last token.
-          // Also, ungrounded frames would have end = -1.
-          *output++ = (end == -1) ? -1 : (end - 1 - parser_state->begin());
-        }
-      });
-    } else {
-      LOG(FATAL) << "Unknown link feature: " << name;
-    }
-		**/
   }
 }
 
 void FastTextFeatureExtractor::Extract(int channel,
                                    SemparState *state,
-                                   int *output) const {
+                                   float *output) const {
   functions_[channel](state, output);
 }
 

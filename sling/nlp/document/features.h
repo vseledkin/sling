@@ -100,13 +100,16 @@ class DocumentFeatures {
   Digit digit(int index) const {
     return features_[index].digit;
   }
-
+  float* vector(int index) const {
+    return features_[index].vector;
+  }
  private:
   // Lexical features for token.
   struct TokenFeatures {
     int word;                                   // word id
     Affix *prefix = nullptr;                    // longest prefix
     Affix *suffix = nullptr;                    // longest suffix
+    float *vector = nullptr;
     Hyphen hyphen = NO_HYPHEN;                  // hyphenation
     Capitalization capitalization = LOWERCASE;  // capitalization
     Punctuation punctuation = NO_PUNCTUATION;   // punctuation
@@ -125,4 +128,3 @@ class DocumentFeatures {
 }  // namespace sling
 
 #endif  // SLING_NLP_DOCUMENT_FEATURES_H_
-
