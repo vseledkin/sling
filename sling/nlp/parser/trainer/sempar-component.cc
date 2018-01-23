@@ -40,6 +40,7 @@ SemparComponent::~SemparComponent() {
 void SemparComponent::InitializeComponent(const ComponentSpec &spec) {
   // Save off the passed spec for future reference.
   spec_ = spec;
+	LOG(INFO) << "component load started " << spec.name();
 
   // Set up the underlying transition system.
   const string &system = spec.transition_system().registered_name();
@@ -70,8 +71,10 @@ void SemparComponent::InitializeComponent(const ComponentSpec &spec) {
   // Set up the feature extractors.
   fixed_feature_extractor_.Init(spec_, &resources_);
   link_feature_extractor_.Init(spec_, &resources_);
+  fast_text_feature_extractor_.Init(spec_, &resources_);
   // Initialize gold transition generator.
   gold_transition_generator_.Init(resources_.global);
+	LOG(INFO) << "component load finished " << spec.name();
 }
 
 void SemparComponent::InitializeData(
@@ -183,17 +186,17 @@ void SemparComponent::GetFixedFeatures(int channel_id, int64 *output) const {
 }
 
 void SemparComponent::GetFastTextFeatures(int channel_id, float *output) const {
+	//std::cout << " batch: " << batch_.size() << std::endl;
   int channel_size = fast_text_feature_extractor_.ChannelSize(channel_id);
-	std::cout << " batch: " << batch_.size() << std::endl;
-  std::cout << " channel_size: " << channel_size << std::endl;
+	//std::cout << " channel_size: " << channel_size << std::endl;
+	int size = batch_.size() * channel_size;
+  for (int i = 0; i < size; ++i) output[i] = -1; // padding values
 
-  int size = batch_.size() * 64;
-  for (int i = 0; i < size; ++i) output[i] = -1;
-
-  //for (SemparState *state : batch_) {
-  //  fixed_feature_extractor_.Extract(channel_id, state, output);
-  //  output += columns;
-  //}
+	for (SemparState *state : batch_) {
+		//std::cout << " s: " << state->current() << " " << state->current_token_text() << std::endl;
+		fast_text_feature_extractor_.Extract(channel_id, state, output);
+		output += size;
+	}
 }
 
 void SemparComponent::GetRawLinkFeatures(

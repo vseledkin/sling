@@ -269,8 +269,7 @@ void LinkFeatureExtractor::Extract(int channel,
 }
 
 
-void FastTextFeatureExtractor::Init(
-    syntaxnet::dragnn::ComponentSpec &spec, SharedResources *resources) {
+void FastTextFeatureExtractor::Init(syntaxnet::dragnn::ComponentSpec &spec, SharedResources *resources) {
   for (const auto &ft : spec.fast_text_feature()) {
     CHECK(ft.has_embedding_dim()) << ft.DebugString();
     //const string &name = link.fml();
@@ -282,8 +281,12 @@ void FastTextFeatureExtractor::Init(
 		functions_.push_back([](SemparState *state, float *output) {
 			int c = state->current();
 			if (c >= state->end() || c < state->begin()) return;
-				LOG(INFO) << " " << c << " " << state->current_token_text();
-      output = state->features()->vector(c);
+			//LOG(INFO) << " " << c << " " << state->current_token_text();
+			fasttext::Vector v(SharedResources::fst->getDimension());
+			SharedResources::fst->getWordVector(v, state->current_token_text());
+			for (int64_t i = 0; i < SharedResources::fst->getDimension(); i++) {
+				output[i] = v[i];
+			}
 		});
   }
 }
@@ -293,8 +296,6 @@ void FastTextFeatureExtractor::Extract(int channel,
                                    float *output) const {
   functions_[channel](state, output);
 }
-
-
 
 }  // namespace nlp
 }  // namespace sling

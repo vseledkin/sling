@@ -121,7 +121,7 @@ def run_training(sess, trainers, annotator, evaluator, pretrain_steps,
     checkpoint_stats[target_idx + 1] += 1
     if step == 0:
       tf.logging.info('Initial cost at step 0: %f', cost)
-    if step > 0 and step % 100 == 0:
+    if step > 0 and step % 10 == 0:
       tf.logging.info('cost at step %d: %f', step, cost)
     if (step + 1) % report_every == 0 or step + 1 == len(target_for_step):
       tf.logging.info('finished step: %d, actual: %d, cost : %f',
